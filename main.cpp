@@ -1,40 +1,60 @@
 #include <iostream>
 
+/* Validation of a real number*/
 bool validRealNumber(std::string number) {
     int period = 0, numerals = 0;
     for (int i = 0; i < number.length(); ++i) {
         if (number[i] == '.') period++;
         else if (number[i] >= '0' && number[i] <= '9') numerals++;
 
-        //errors
+        /* errors */
         //incorrect character
-        if (number[i] != '.' && number[i] != '-' && !(number[i] >= '0' && number[i] <= '9')) {
-            //error = std::string("No. We do not allow the use of the character ") + number[i] + " in the entry\n";
+        if (number[i] != '.' && number[i] != '-' && !(number[i] >= '0' && number[i] <= '9'))
             return false;
-        }
-
         //More than one decimal point
-        if (period > 1) {
-            //error = "No. There can be only one decimal point\n";
+        if (period > 1)
             return false;
-        }
-
         //No one num
-        if (i == (number.length() - 1) && numerals == 0) {
-            //error = "No. There must be at least one digit in the entry\n";
+        if (i == (number.length() - 1) && numerals == 0)
             return false;
-        }
-
-        if (i > 0 && number[i] == '-') {
-            //error = "No. Character \"-\" can only be the first character\n";
+        //Character "-" can only be the first character
+        if (i > 0 && number[i] == '-')
             return false;
-        }
         i++;
     }
     return true;
 }
 
-//get part of a string "str" from index "n" to character "c"
+/*Correct real number.  - Zero delete*/
+std::string CorrectRealNum(std::string number) {
+    std::string result;
+    int i = 0;
+
+    if (number[0] == '-') {
+        result += '-';
+        i++;
+    }
+    for (; i < number.length(); ++i) {
+        if (number[i] != '0') break;
+    }
+    for (; number[i] != '.' && i < number.length(); ++i) {
+        result += number[i];
+    }
+    if (number[i] == '.' ) {
+        std::string mant;
+
+        for (; i < number.length(); ++i) {
+            mant += number[i];
+            if (number[i] != '0' && number[i] != '.') {
+                result += mant;
+                mant.clear();
+            }
+        }
+    }
+    return result;
+}
+
+/*get part of a string "str" from index "n" to character "c"*/
 std::string getPartRow(std::string str, int n, char c) {
     std::string partStr;
 
@@ -45,10 +65,9 @@ std::string getPartRow(std::string str, int n, char c) {
 }
 
 int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
-        //std::string firstNumber, secondNumber, error = "";
     std::string exponentFirstNumber, exponentSecondNumber, mantissaFirstNumber, mantissaSecondNumber;
-    bool correct = false;
-    bool equal = false;
+
+    if (firstNumber == secondNumber) return 2;
 
         //get exponent parts
     int firstPartNumIndex = 0, secondPartNumIndex = 0;
@@ -61,10 +80,14 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
         if (secondNumber[i] == '-' || secondNumber[i] == '0') secondPartNumIndex++;
         else break;
     }
+
     exponentFirstNumber = getPartRow(firstNumber, firstPartNumIndex, '.');
     exponentSecondNumber = getPartRow(secondNumber, secondPartNumIndex, '.');
-    mantissaFirstNumber =  firstNumber.substr(firstNumber.find('.') + 1, firstNumber.length() - 1);
-    mantissaSecondNumber =  secondNumber.substr(secondNumber.find('.') + 1, secondNumber.length() - 1);
+
+    if (firstNumber.find('.') != std::string::npos)
+        mantissaFirstNumber = firstNumber.substr(firstNumber.find('.') + 1, firstNumber.length() - 1);
+    if (secondNumber.find('.') != std::string::npos)
+        mantissaSecondNumber =  secondNumber.substr(secondNumber.find('.') + 1, secondNumber.length() - 1);
 
         //check for negativity
     if (firstNumber[0] == '-' || secondNumber[0] == '-') {
@@ -94,10 +117,8 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
             }
         }
     } else {
-            //if the parts are equal
-        if (exponentFirstNumber == exponentSecondNumber && mantissaFirstNumber == mantissaSecondNumber) return 2;
             //if one exponent length more
-        else if (exponentFirstNumber.length() > exponentSecondNumber.length()) return true;
+        if (exponentFirstNumber.length() > exponentSecondNumber.length()) return true;
         else if (exponentFirstNumber.length() < exponentSecondNumber.length()) return false;
             //if both have the equal length, check every char
         else {
@@ -105,6 +126,7 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
                 if (exponentFirstNumber[i] > exponentSecondNumber[i]) return true;
                 else if (exponentFirstNumber[i] < exponentSecondNumber[i]) return false;
             }
+
             for (int i = 0; ((mantissaFirstNumber.length() < mantissaSecondNumber.length()) ?
                              (i < mantissaFirstNumber.length()) : (i < mantissaSecondNumber.length())); ++i) {
                 if (mantissaFirstNumber[i] > mantissaSecondNumber[i]) return true;
@@ -112,7 +134,6 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
             }
             if (mantissaFirstNumber.length() > mantissaSecondNumber.length()) return true;
             else if (mantissaFirstNumber.length() < mantissaSecondNumber.length()) return false;
-            else return 2;
         }
 
     }
@@ -120,11 +141,10 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
 }
 
 int main() {
-    std::string firstNumber, secondNumber, error = "", result;
+    std::string firstNumber, secondNumber, result;
     std::string exponentFirstNumber, exponentSecondNumber, mantissaFirstNumber, mantissaSecondNumber;
     int resultFunction;
     bool correct = false;
-    bool equal = false;
 
     while (!correct) {
         std::cout << "Input first number\n";
@@ -141,11 +161,14 @@ int main() {
         else (std::cout << "incorrect data.\n");
     }
 
+    secondNumber = CorrectRealNum(secondNumber);
+    firstNumber = CorrectRealNum(firstNumber);
+
     resultFunction = firstRealNumMoreSecond(firstNumber, secondNumber);
     if (resultFunction == 0) result = "Less";
     else if (resultFunction == 1) result = "More";
     else if (resultFunction == 2) result = "Equal";
-    else result = "Error ";
+    else result = "Something went wrong (error " + std::to_string(resultFunction) + ")";
 
     std::cout << result;
 }
