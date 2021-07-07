@@ -20,7 +20,6 @@ bool validRealNumber(std::string number) {
         //Character "-" can only be the first character
         if (i > 0 && number[i] == '-')
             return false;
-        i++;
     }
     return true;
 }
@@ -37,7 +36,7 @@ std::string CorrectRealNum(std::string number) {
     for (; i < number.length(); ++i) {
         if (number[i] != '0') break;
     }
-    for (; number[i] != '.' && i < number.length(); ++i) {
+    for (; i < number.length() && number[i] != '.'; ++i) {
         result += number[i];
     }
     if (number[i] == '.' ) {
@@ -58,7 +57,7 @@ std::string CorrectRealNum(std::string number) {
 std::string getPartRow(std::string str, int n, char c) {
     std::string partStr;
 
-    for (int i = n; str[i] != '.' && i < str.length(); ++i) {
+    for (int i = n; i < str.length() && str[i] != '.'; ++i) {
         partStr += str[i];
     }
     return partStr;
@@ -72,11 +71,11 @@ int firstRealNumMoreSecond(std::string firstNumber, std::string secondNumber) {
         //get exponent parts
     int firstPartNumIndex = 0, secondPartNumIndex = 0;
 
-    for (int i = 0; firstNumber[i] != '.' && i < firstNumber.length(); ++i) {
+    for (int i = 0; i < firstNumber.length() && firstNumber[i] != '.'; ++i) {
         if (firstNumber[i] == '-' || firstNumber[i] == '0') firstPartNumIndex++;
         else break;
     }
-    for (int i = 0; secondNumber[i] != '.' && i < secondNumber.length(); ++i) {
+    for (int i = 0; i < secondNumber.length() && secondNumber[i] != '.'; ++i) {
         if (secondNumber[i] == '-' || secondNumber[i] == '0') secondPartNumIndex++;
         else break;
     }
@@ -149,8 +148,8 @@ int main() {
     while (!correct) {
         std::cout << "Input first number\n";
         std::cin >> firstNumber;
-        if (validRealNumber(firstNumber)) correct = true;
-        else (std::cout << "incorrect data.\n");
+        correct = validRealNumber(firstNumber);
+        if (!correct) std::cout << "incorrect data.\n";
     }
     correct = false;
 
